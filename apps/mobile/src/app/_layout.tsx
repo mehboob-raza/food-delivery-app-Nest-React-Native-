@@ -7,6 +7,11 @@ const queryClient = new QueryClient()
 export default function TabLayout() {
   return (
     <QueryClientProvider client={queryClient}>
+                  <Text>Could not reach the API. Is the server runnig?</Text>
+                  <Text>Could not reach the API. Is the server runnig?</Text>
+                  <Text>Could not reach the API. Is the server runnig?</Text>
+                  <Text>Could not reach the API. Is the server runnig?</Text>
+      
       <AnimatedSplashOverlay />
       <AppTabs />
     </QueryClientProvider>
