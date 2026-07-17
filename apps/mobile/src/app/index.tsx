@@ -33,6 +33,10 @@ export default function HomeScreen() {
         error && (
           <View>
             <Text>Could not reach the API. Is the server runnig?</Text>
+            <Text>Could not reach the API. Is the server runnig?</Text>
+            <Text>Could not reach the API. Is the server runnig?</Text>
+            <Text>Could not reach the API. Is the server runnig?</Text>
+            <Text>Could not reach the API. Is the server runnig?</Text>
           </View>
         )
       }
