@@ -1,7 +1,7 @@
-import { api } from '@lib/axios'
 import { useQuery } from '@tanstack/react-query'
 import { HealthCheckResponse } from '@food-delivery/types'
 import { ActivityIndicator, Text, View } from 'react-native'
+import { api } from '@/lib/axios'
 
 
 export default function HomeScreen() {
@@ -33,13 +33,11 @@ export default function HomeScreen() {
         error && (
           <View>
             <Text>Could not reach the API. Is the server runnig?</Text>
-            <Text>Could not reach the API. Is the server runnig?</Text>
-            <Text>Could not reach the API. Is the server runnig?</Text>
-            <Text>Could not reach the API. Is the server runnig?</Text>
-            <Text>Could not reach the API. Is the server runnig?</Text>
           </View>
         )
       }
     </View>
   )
 }
+
+
