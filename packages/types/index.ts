@@ -17,3 +17,10 @@ export interface HealthCheckResponse {
     status: string;
     timestamp: Date
 }
+
+export interface JwtPayload {
+    sub: string 
+    email: string
+    role: string
+}
+
