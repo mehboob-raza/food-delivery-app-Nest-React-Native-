@@ -61,64 +61,33 @@ export class AuthService {
 
     async login(dto: LoginDto) {
         const [user] = await this.db
-            .select({
-                id: schema.users.id,
-                firstName: schema.users.firstName,
-                lastName: schema.users.lastName,
-                email: schema.users.email,
-                password: schema.users.password,
-                role: schema.users.role,
-            })
+            .select()
             .from(schema.users)
-            .where(eq(schema.users.email, dto.email))
-            .limit(1);
+            .where(eq(schema.users.email, dto.email));
 
-        if (!user) {
-            throw new UnauthorizedException('Invalid Credentials');
-        }
+        if (!user) throw new UnauthorizedException('Invalid Credentials');
 
-        const isPasswordValid = await bcrypt.compare(
-            dto.password,
-            user.password,
-        );
+        const passwordMatch = await bcrypt.compare(dto.password, user.password);
 
-        if (!isPasswordValid) {
-            throw new UnauthorizedException('Invalid Credentials');
-        }
-
-        const token = await this.jwtService.signAsync({
-            sub: user.id,
-            email: user.email,
-            role: user.role,
-        });
+        if (!passwordMatch) throw new UnauthorizedException('Invalid Credentials');
 
         return {
-            user: {
-                id: user.id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                role: user.role,
-            },
-            token,
+            user: this.sanitizeUser(user),
+            token: this.generateToken(user),
         };
     }
-    // async login(dto: LoginDto) {
-    //     const [user] = await this.db
-    //         .select()
-    //         .from(schema.users)
-    //         .where(eq(schema.users.email, dto.email));
 
-    //     if (!user) throw new UnauthorizedException('Invalid Credentials');
-
-    //     const passwordMatch = await bcrypt.compare(dto.password, user.password);
-
-    //     if (!passwordMatch) throw new UnauthorizedException('Invalid Credentials');
-
-    //     return {
-    //         user: this.sanitizeUser(user),
-    //         token: this.generateToken(user),
-    //     };
+    // async getUsers() {
+    //     return await this.db
+    //         .select({
+    //             id: schema.users.id,
+    //             firstName: schema.users.firstName,
+    //             lastName: schema.users.lastName,
+    //             email: schema.users.email,
+    //             role: schema.users.role,
+    //             isOnline: schema.users.isOnline,
+    //         })
+    //         .from(schema.users);
     // }
 
     private generateToken(user: schema.NewUser) {
