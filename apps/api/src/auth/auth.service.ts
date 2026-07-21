@@ -21,49 +21,105 @@ export class AuthService {
     ) { }
 
     async register(dto: RegisterDto) {
-        const [existing] = await this.db
-            .select()
-            .from(schema.users)
-            .where(eq(schema.users.email, dto.email));
+        //traditional way to check existing email. but it increases response time.
+        // const [existing] = await this.db
+        //     .select()
+        //     .from(schema.users)
+        //     .where(eq(schema.users.email, dto.email));
 
-        if (existing) throw new ConflictException('Email already in use');
+        // if (existing) throw new ConflictException('Email already in use');
+        try {
+            const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-        const hashedPassword = await bcrypt.hash(dto.password, 10);
+            const [user] = await this.db
+                .insert(schema.users)
+                .values({
+                    firstName: dto.firstName,
+                    lastName: dto.lastName,
+                    email: dto.email,
+                    password: hashedPassword,
+                    role: dto.role,
+                })
+                .returning();
 
-        const [user] = await this.db
-            .insert(schema.users)
-            .values({
-                firstName: dto.firstName,
-                lastName: dto.lastName,
-                email: dto.email,
-                password: hashedPassword,
-                role: dto.role,
-            })
-            .returning();
+            return {
+                user: this.sanitizeUser(user),
+                token: this.generateToken(user),
+            };
+        } catch (error: any) {
+            if (error.code === '23505') {
+                throw new ConflictException({
+                    statusCode: 409,
+                    message: 'Email already in use',
+                    error: 'Conflict',
+                });
+            }
+            throw error
+        }
 
-        return {
-            user: this.sanitizeUser(user),
-            token: this.generateToken(user),
-        };
     }
 
     async login(dto: LoginDto) {
         const [user] = await this.db
-            .select()
+            .select({
+                id: schema.users.id,
+                firstName: schema.users.firstName,
+                lastName: schema.users.lastName,
+                email: schema.users.email,
+                password: schema.users.password,
+                role: schema.users.role,
+            })
             .from(schema.users)
-            .where(eq(schema.users.email, dto.email));
+            .where(eq(schema.users.email, dto.email))
+            .limit(1);
 
-        if (!user) throw new UnauthorizedException('Invalid Credentials');
+        if (!user) {
+            throw new UnauthorizedException('Invalid Credentials');
+        }
 
-        const passwordMatch = await bcrypt.compare(dto.password, user.password);
+        const isPasswordValid = await bcrypt.compare(
+            dto.password,
+            user.password,
+        );
 
-        if (!passwordMatch) throw new UnauthorizedException('Invalid Credentials');
+        if (!isPasswordValid) {
+            throw new UnauthorizedException('Invalid Credentials');
+        }
+
+        const token = await this.jwtService.signAsync({
+            sub: user.id,
+            email: user.email,
+            role: user.role,
+        });
 
         return {
-            user: this.sanitizeUser(user),
-            token: this.generateToken(user),
+            user: {
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role,
+            },
+            token,
         };
     }
+    // async login(dto: LoginDto) {
+    //     const [user] = await this.db
+    //         .select()
+    //         .from(schema.users)
+    //         .where(eq(schema.users.email, dto.email));
+
+    //     if (!user) throw new UnauthorizedException('Invalid Credentials');
+
+    //     const passwordMatch = await bcrypt.compare(dto.password, user.password);
+
+    //     if (!passwordMatch) throw new UnauthorizedException('Invalid Credentials');
+
+    //     return {
+    //         user: this.sanitizeUser(user),
+    //         token: this.generateToken(user),
+    //     };
+    // }
 
     private generateToken(user: schema.NewUser) {
         const payload: JwtPayload = {
