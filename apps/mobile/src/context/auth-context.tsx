@@ -50,28 +50,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(res.data.user);
     }
 
-    // async function register(data: RegisterData) {
-    //     const res = await api.post('/auth/register', data);
-    //     console.log('res', res);
-
-    //     await saveToken(res.data.token);
-    //     setUser(res.data.user);
-    // }
-    async function register(data) {
+    async function register(data: RegisterData) {
         try {
-            console.log('REGISTER URL:', api.defaults.baseURL + '/auth/register');
-            console.log('REGISTER DATA:', data);
-
             const res = await api.post('/auth/register', data);
-
-            console.log('REGISTER RESPONSE:', res.data);
-
             return res.data;
         } catch (error: any) {
-            console.log('REGISTER ERROR MESSAGE:', error.message);
-            console.log('REGISTER ERROR STATUS:', error.response?.status);
-            console.log('REGISTER ERROR DATA:', error.response?.data);
-
             throw error;
         }
     }
