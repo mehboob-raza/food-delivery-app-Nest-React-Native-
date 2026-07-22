@@ -22,12 +22,12 @@ export class AuthService {
 
     async register(dto: RegisterDto) {
         //traditional way to check existing email. but it increases response time.
-        // const [existing] = await this.db
-        //     .select()
-        //     .from(schema.users)
-        //     .where(eq(schema.users.email, dto.email));
+        const [existing] = await this.db
+            .select()
+            .from(schema.users)
+            .where(eq(schema.users.email, dto.email));
 
-        // if (existing) throw new ConflictException('Email already in use');
+        if (existing) throw new ConflictException('Email already in use');
         try {
             const hashedPassword = await bcrypt.hash(dto.password, 10);
 
@@ -47,13 +47,6 @@ export class AuthService {
                 token: this.generateToken(user),
             };
         } catch (error: any) {
-            if (error.code === '23505') {
-                throw new ConflictException({
-                    statusCode: 409,
-                    message: 'Email already in use',
-                    error: 'Conflict',
-                });
-            }
             throw error
         }
 
@@ -77,18 +70,6 @@ export class AuthService {
         };
     }
 
-    // async getUsers() {
-    //     return await this.db
-    //         .select({
-    //             id: schema.users.id,
-    //             firstName: schema.users.firstName,
-    //             lastName: schema.users.lastName,
-    //             email: schema.users.email,
-    //             role: schema.users.role,
-    //             isOnline: schema.users.isOnline,
-    //         })
-    //         .from(schema.users);
-    // }
 
     private generateToken(user: schema.NewUser) {
         const payload: JwtPayload = {

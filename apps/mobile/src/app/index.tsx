@@ -1,43 +1,18 @@
-import { useQuery } from '@tanstack/react-query'
-import { HealthCheckResponse } from '@food-delivery/types'
-import { ActivityIndicator, Text, View } from 'react-native'
-import { api } from '@/lib/axios'
+import { Redirect } from 'expo-router';
+import { useAuth } from '@/context/auth-context';
+import { UserRole } from '@food-delivery/types';
 
+export default function Index() {
+    const { user, isLoading } = useAuth();
 
-export default function HomeScreen() {
-  const { data: health, isLoading, error } = useQuery<HealthCheckResponse>({
-    queryKey: ['health'],
-    queryFn: () => api.get<HealthCheckResponse>('/health').then((res) => res.data)
-  })
+    if (isLoading) return null;
 
+    if (!user) return <Redirect href="/login" />;
 
+    // if (user.role === UserRole.CUSTOMER) return <Redirect href="/(customer)" />;
+    // if (user.role === UserRole.RESTAURANT_OWNER)
+    //     return <Redirect href="/(owner)" />;
+    // if (user.role === UserRole.DRIVER) return <Redirect href="/(driver)" />;
 
-  return (
-    <View>
-      <Text>FOOD DELIVERY</Text>
-      <Text>Connection Text</Text>
-      {isLoading && <ActivityIndicator size='large' color='#ff6b35' />}
-
-      {
-        health && (
-          <View>
-            <Text> API Status : {health.status}</Text>
-            <Text>
-              {new Date(health.timestamp).toLocaleTimeString()}
-            </Text>
-          </View>
-        )
-      }
-
-      {
-        error && (
-          <View>
-            <Text>Could not reach the API. Is the server runnig?</Text>
-          </View>
-        )
-      }
-    </View>
-  )
+    return <Redirect href="/login" />;
 }
-
-
