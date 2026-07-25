@@ -10,8 +10,8 @@ import { NeonHttpDatabase } from 'drizzle-orm/neon-http';
 import * as schema from '../db/schema';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
-import { CacheService } from '../cache/cache.service';
-import { CacheKeys } from '../cache/cache-keys';
+// import { CacheService } from '../cache/cache.service';
+// import { CacheKeys } from '../cache/cache-keys';
 
 @Injectable()
 export class RestaurantsService {
@@ -19,7 +19,7 @@ export class RestaurantsService {
 
     constructor(
         @Inject('DB') private db: NeonHttpDatabase<typeof schema>,
-        private cacheService: CacheService,
+        // private cacheService: CacheService,
     ) { }
 
     async create(ownerId: string, dto: CreateRestaurantDto) {
@@ -44,7 +44,7 @@ export class RestaurantsService {
             })
             .returning();
 
-        await this.cacheService.del(CacheKeys.RESTAURANTS_ALL);
+        // await this.cacheService.del(CacheKeys.RESTAURANTS_ALL);
 
         return restaurant;
     }
@@ -86,23 +86,23 @@ export class RestaurantsService {
                 );
         }
 
-        const cached = await this.cacheService.get<
-            (typeof schema.restaurants.$inferSelect)[]
-        >(CacheKeys.RESTAURANTS_ALL);
+        // const cached = await this.cacheService.get<
+        //     (typeof schema.restaurants.$inferSelect)[]
+        // >(CacheKeys.RESTAURANTS_ALL);
 
-        if (cached) {
-            this.logger.log('Returning restaurants from cache');
-            return cached;
-        }
+        // if (cached) {
+        //     this.logger.log('Returning restaurants from cache');
+        //     return cached;
+        // }
 
-        this.logger.log('Cache miss — fetching restaurants from DB');
+        // this.logger.log('Cache miss — fetching restaurants from DB');
 
         const restaurants = this.db
             .select()
             .from(schema.restaurants)
             .where(eq(schema.restaurants.isOpen, true));
 
-        await this.cacheService.set(CacheKeys.RESTAURANTS_ALL, restaurants, 300);
+        // await this.cacheService.set(CacheKeys.RESTAURANTS_ALL, restaurants, 300);
 
         return restaurants;
     }
@@ -128,12 +128,12 @@ export class RestaurantsService {
             .where(eq(schema.restaurants.id, id))
             .returning();
 
-        await this.cacheService.del(
-            CacheKeys.RESTAURANTS_ALL,
-            CacheKeys.RESTAURANT_BY_ID(id),
-        );
+        // await this.cacheService.del(
+        //     CacheKeys.RESTAURANTS_ALL,
+        //     CacheKeys.RESTAURANT_BY_ID(id),
+        // );
 
-        this.logger.log(`Cache invalidated for restaurant ${id}`);
+        // this.logger.log(`Cache invalidated for restaurant ${id}`);
 
         return updated;
     }

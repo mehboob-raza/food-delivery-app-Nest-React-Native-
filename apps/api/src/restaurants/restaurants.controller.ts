@@ -41,12 +41,15 @@ export class RestaurantsController {
     }
 
     @Get()
+    @UseGuards(RolesGuard)
+    @Roles(UserRole.CUSTOMER, UserRole.DRIVER)
     findAll(@Query('search') search?: string) {
         // @Query('search') extracts ?search= from the URL — optional
         return this.restaurantsService.findAll(search);
     }
 
     @Get(':id')
+
     findOne(@Param('id') id: string) {
         return this.restaurantsService.findById(id);
     }
