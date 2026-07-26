@@ -16,7 +16,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { api } from '@/lib/axios';
-// import { useImageUploader } from '@/lib/uploadthing';
+import { useImageUploader } from '@/lib/uploadthing';
 import { MenuCategory, MenuItem, RestaurantType } from '@food-delivery/types';
 
 export default function OwnerMenuScreen() {
@@ -110,17 +110,17 @@ export default function OwnerMenuScreen() {
 
     const [newItemImageUrl, setNewItemImageUrl] = useState<string | null>(null);
 
-    // const {
-    //     openImagePicker: openItemImagePicker,
-    //     isUploading: uploadingItemImage,
-    // } = useImageUploader('menuItemImage', {
-    //     onClientUploadComplete: (res) => {
-    //         setNewItemImageUrl(res[0].ufsUrl);
-    //     },
-    //     onUploadError: (error) => {
-    //         Alert.alert('Upload failed', error.message);
-    //     },
-    // });
+    const {
+        openImagePicker: openItemImagePicker,
+        isUploading: uploadingItemImage,
+    } = useImageUploader('menuItemImage', {
+        onClientUploadComplete: (res) => {
+            setNewItemImageUrl(res[0].ufsUrl);
+        },
+        onUploadError: (error) => {
+            Alert.alert('Upload failed', error.message);
+        },
+    });
 
     const { mutate: addItem, isPending: addingItem } = useMutation({
         mutationFn: () =>
@@ -353,7 +353,7 @@ export default function OwnerMenuScreen() {
                     <View style={styles.modal}>
                         <Text style={styles.modalTitle}>New Item</Text>
 
-                        {/* <Pressable
+                        <Pressable
                             style={styles.imagePicker}
                             onPress={() =>
                                 void openItemImagePicker({
@@ -389,7 +389,7 @@ export default function OwnerMenuScreen() {
                                         : 'Tap to add item image'}
                                 </Text>
                             )}
-                        </Pressable> */}
+                        </Pressable>
 
                         <TextInput
                             style={styles.input}
