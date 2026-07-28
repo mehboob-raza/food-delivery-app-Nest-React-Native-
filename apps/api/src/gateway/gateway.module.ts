@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { OrdersGateway } from './orders.gateway';
-// import { LocationModule } from '../location/location.module';
+import { LocationModule } from '../location/location.module';
 
 @Module({
-    // imports: [LocationModule],
+    imports: [LocationModule],
     providers: [OrdersGateway],
     exports: [OrdersGateway],
 })

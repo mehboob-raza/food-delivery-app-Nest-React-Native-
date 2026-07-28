@@ -9,6 +9,9 @@ import { AuthModule } from './auth/auth.module';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { MenuModule } from './menu/menu.module';
 import { OrdersModule } from './orders/orders.module';
+import { LocationService } from './location/location.service';
+import { LocationModule } from './location/location.module';
+import { DriverModule } from './driver/driver.module';
 
 @Module({
   imports: [
@@ -17,9 +20,11 @@ import { OrdersModule } from './orders/orders.module';
     AuthModule,
     RestaurantsModule,
     MenuModule,
-    OrdersModule
+    OrdersModule,
+    LocationModule,
+    DriverModule
   ],
   controllers: [AppController, AuthController],
-  providers: [AppService, AuthService],
+  providers: [AppService, AuthService, LocationService],
 })
 export class AppModule { }
