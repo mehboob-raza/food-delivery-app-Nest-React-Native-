@@ -5,7 +5,7 @@ import * as schema from './db/schema';
 
 @Controller()
 export class AppController {
-  constructor(@Inject('DB') private db: NeonHttpDatabase<typeof schema>) {}
+  constructor(@Inject('DB') private db: NeonHttpDatabase<typeof schema>) { }
 
   @Get('db-test')
   async dbTest() {

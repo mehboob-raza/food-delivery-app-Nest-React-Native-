@@ -3,19 +3,23 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { createRouteHandler } from 'uploadthing/express';
 import { uploadRouter } from './uploadthing/upload-router';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    rawBody: true,
+  });
 
-  app.enableCors()
-  app.setGlobalPrefix('api') // /api/..
+  app.enableCors();
+  app.setGlobalPrefix('api'); // /api/....
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
+      forbidNonWhitelisted: true,
       transform: true,
-      forbidNonWhitelisted: true
     }),
-  )
+  );
+
   app.use(
     '/api/uploadthing',
     createRouteHandler({
@@ -25,10 +29,10 @@ async function bootstrap() {
       },
     }),
   );
-  const PORT = process.env.PORT ?? 3000
-  await app.listen(PORT);
 
-  console.log('Server running on post: ', PORT);
+  const port = process.env.PORT ?? 3000;
 
+  await app.listen(port);
+  console.log(`API running on port ${port}`);
 }
 void bootstrap();
